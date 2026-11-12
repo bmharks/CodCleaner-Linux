@@ -4,11 +4,18 @@
 set -e
 
 # ==========================================
-# 1. PROCESS 'uo' DIRECTORY
+# 1. PROCESS 'uo' OR 'UO' DIRECTORY
 # ==========================================
+TARGET_UO=""
 if [ -d "uo" ]; then
+    TARGET_UO="uo"
+elif [ -d "UO" ]; then
+    TARGET_UO="UO"
+fi
+
+if [ -n "$TARGET_UO" ]; then
     mkdir -p "archived_maps"
-    echo "Scanning 'uo' for custom .pk3 files..."
+    echo "Scanning '$TARGET_UO' for custom .pk3 files..."
     
     UO_EXCLUDED=(
         "pakuo00.pk3" "pakuo01.pk3" "pakuo02.pk3" "pakuo03.pk3"
@@ -17,7 +24,7 @@ if [ -d "uo" ]; then
         "localized_english_pakuo00.pk3" "localized_english_pakuo01.pk3" "localized_english_pakuo02.pk3"
     )
     
-    find "uo" -maxdepth 1 -type f -name "*.pk3" | while read -r filepath; do
+    find "$TARGET_UO" -maxdepth 1 -type f -name "*.pk3" | while read -r filepath; do
         filename=$(basename "$filepath")
         skip=0
         for excluded in "${UO_EXCLUDED[@]}"; do
@@ -28,20 +35,27 @@ if [ -d "uo" ]; then
         done
         
         if [ $skip -eq 1 ]; then
-            echo "  [Skipped] uo/$filename"
+            echo "  [Skipped] $TARGET_UO/$filename"
         else
-            echo "  [Moving]  uo/$filename -> archived_maps/"
+            echo "  [Moving]  $TARGET_UO/$filename -> archived_maps/"
             mv "$filepath" "archived_maps/"
         fi
     done
 fi
 
 # ==========================================
-# 2. PROCESS 'main' DIRECTORY
+# 2. PROCESS 'main' OR 'Main' DIRECTORY
 # ==========================================
+TARGET_MAIN=""
 if [ -d "main" ]; then
+    TARGET_MAIN="main"
+elif [ -d "Main" ]; then
+    TARGET_MAIN="Main"
+fi
+
+if [ -n "$TARGET_MAIN" ]; then
     mkdir -p "archived_main"
-    echo "Scanning 'main' for custom .pk3 files..."
+    echo "Scanning '$TARGET_MAIN' for custom .pk3 files..."
     
     MAIN_EXCLUDED=(
         # DLLs, logs, configs, data
@@ -57,7 +71,7 @@ if [ -d "main" ]; then
         "localized_english_pak4.pk3" "localized_english_pak5.pk3"
     )
     
-    find "main" -maxdepth 1 -type f -name "*.pk3" | while read -r filepath; do
+    find "$TARGET_MAIN" -maxdepth 1 -type f -name "*.pk3" | while read -r filepath; do
         filename=$(basename "$filepath")
         skip=0
         for excluded in "${MAIN_EXCLUDED[@]}"; do
@@ -68,9 +82,9 @@ if [ -d "main" ]; then
         done
         
         if [ $skip -eq 1 ]; then
-            echo "  [Skipped] main/$filename"
+            echo "  [Skipped] $TARGET_MAIN/$filename"
         else
-            echo "  [Moving]  main/$filename -> archived_main/"
+            echo "  [Moving]  $TARGET_MAIN/$filename -> archived_main/"
             mv "$filepath" "archived_main/"
         fi
     done
